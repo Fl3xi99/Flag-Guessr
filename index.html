@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Flag Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="game-container">
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <div>Fetching Globle Database...</div>
+    </div>
+
+    <div class="header-row">
+        <h1>Global Flag Quiz</h1>
+        <div class="theme-selector">
+            <label for="theme-select">🎨</label>
+            <select id="theme-select">
+                <option value="dark">Dark Mode</option>
+                <option value="light">Light Mode</option>
+                <option value="cyberpunk">Cyberpunk</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Streak: <span id="streak">0</span></div>
+    </div>
+    
+    <div class="flag-box">
+        <img id="flag-img" src="" alt="Flag to guess">
+    </div>
+    
+    <div class="options-grid" id="options-container">
+        </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
