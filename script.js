@@ -5,6 +5,7 @@ let countryDatabase = [];
 let currentCountry = null;
 let score = 0;
 let streak = 0;
+let highStreak = 0; // Track the all-time high score state
 
 // DOM Hooks
 const loadingScreen = document.getElementById('loading-screen');
@@ -12,14 +13,13 @@ const flagImg = document.getElementById('flag-img');
 const optionsContainer = document.getElementById('options-container');
 const scoreDisplay = document.getElementById('score');
 const streakDisplay = document.getElementById('streak');
+const highStreakDisplay = document.getElementById('high-streak'); // New Hook
 const themeSelect = document.getElementById('theme-select');
 
 // --- Theme Management ---
 themeSelect.addEventListener('change', (e) => {
     const selectedTheme = e.target.value;
-    // Set an attribute on the <html> level so CSS can style components
     document.documentElement.setAttribute('data-theme', selectedTheme);
-    // Save selection to remember preferences on refresh
     localStorage.setItem('game-theme', selectedTheme);
 });
 
@@ -37,11 +37,14 @@ async function fetchDatabase() {
         const response = await fetch(API_URL);
         const data = await response.json();
         
-        // Clean array mappings
         countryDatabase = data.map(item => ({
             name: item.name.common,
             flagUrl: item.flags.svg || item.flags.png
         }));
+
+        // Load the saved high streak from local storage on startup
+        highStreak = parseInt(localStorage.getItem('flag-high-streak')) || 0;
+        highStreakDisplay.textContent = highStreak;
 
         loadingScreen.style.display = 'none';
         generateQuestion();
@@ -60,7 +63,6 @@ function generateQuestion() {
     currentCountry = countryDatabase[randomIndex];
     flagImg.src = currentCountry.flagUrl;
 
-    // Pick unique choices
     let choices = [currentCountry.name];
     while (choices.length < 4) {
         const randomWrong = countryDatabase[Math.floor(Math.random() * countryDatabase.length)].name;
@@ -69,10 +71,8 @@ function generateQuestion() {
         }
     }
 
-    // Shuffle choices array
     choices.sort(() => Math.random() - 0.5);
 
-    // Build the visual interaction layers
     choices.forEach(countryName => {
         const btn = document.createElement('button');
         btn.textContent = countryName;
@@ -90,11 +90,18 @@ function processGuess(clickedButton, chosenName) {
         clickedButton.classList.add('correct-choice');
         score++;
         streak++;
+
+        // If the current streak beats the record, update it instantly
+        if (streak > highStreak) {
+            highStreak = streak;
+            highStreakDisplay.textContent = highStreak;
+            // Write it directly to the browser storage
+            localStorage.setItem('flag-high-streak', highStreak);
+        }
     } else {
         clickedButton.classList.add('wrong-choice');
-        streak = 0; 
+        streak = 0; // Break the current streak layout
 
-        // Reveal the right answer visually
         allButtons.forEach(btn => {
             if (btn.textContent === currentCountry.name) {
                 btn.classList.add('correct-choice');
