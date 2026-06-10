@@ -42,8 +42,12 @@ async function fetchDatabase() {
             flagUrl: item.flags.svg || item.flags.png
         }));
 
-        // Load the saved high streak from local storage on startup
-        highStreak = parseInt(localStorage.getItem('flag-high-streak')) || 0;
+        // FIX 1: Explicitly parse using base-10 radix, fallback to 0 if NaN occurs
+        const savedStreak = localStorage.getItem('flag-high-streak');
+        highStreak = parseInt(savedStreak, 10);
+        if (isNaN(highStreak)) {
+            highStreak = 0;
+        }
         highStreakDisplay.textContent = highStreak;
 
         loadingScreen.style.display = 'none';
@@ -91,12 +95,12 @@ function processGuess(clickedButton, chosenName) {
         score++;
         streak++;
 
-        // If the current streak beats the record, update it instantly
-        if (streak > highStreak) {
+        // FIX 2: Force numeric type safety evaluation during calculation
+        if (Number(streak) > Number(highStreak)) {
             highStreak = streak;
             highStreakDisplay.textContent = highStreak;
-            // Write it directly to the browser storage
-            localStorage.setItem('flag-high-streak', highStreak);
+            // Force save as a clean string value representation
+            localStorage.setItem('flag-high-streak', highStreak.toString());
         }
     } else {
         clickedButton.classList.add('wrong-choice');
